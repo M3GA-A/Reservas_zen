@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block title %}Inicio · Zen Bienestar{% endblock %}
+{% block content %}
+<section class="hero-shell">
+    <div class="container hero">
+    <div>
+        <span class="kicker">Centro de bienestar</span>
+        <h1>Reserva tu momento de calma.</h1>
+        <p>Donde cuerpo y mente vuelven a encontrarse. Un espacio íntimo dedicado a tu bienestar, con atención 100% personalizada.</p>
+        <div class="actions">
+            <a class="btn btn-primary" href="{{ url_for('reservas') }}">Crear reserva</a>
+            <a class="btn btn-secondary" href="{{ url_for('servicios') }}">Ver servicios</a>
+        </div>
+    </div>
+</section>
+
+<section class="container section">
+    <div class="section-head">
+        <div>
+            <span class="kicker">Destacados</span>
+            <h2>Servicios populares</h2>
+        </div>
+        <a class="btn btn-secondary" href="{{ url_for('servicios') }}">Catálogo completo</a>
+    </div>
+    <div class="grid">
+        {% for servicio in servicios %}
+            <article class="card service-card">
+                <span class="badge">{{ servicio.categoria }}</span>
+                <h3>{{ servicio.nombre }}</h3>
+                <p>{{ servicio.descripcion }}</p>
+                <div class="service-meta">
+                    <span>{{ servicio.duracion }} min</span>
+                    <span>{{ servicio.precio }} €</span>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="space-section" aria-labelledby="espacio-titulo">
+    <div class="container">
+        <header class="space-heading">
+            <span class="kicker">Nuestro espacio</span>
+            <h2 id="espacio-titulo">Un rincón pensado para tu bienestar</h2>
+            <p>En Zen Bienestar cuidamos cada detalle para que, desde el momento en que entras, el mundo exterior desaparezca.</p>
+        </header>
+
+        <div class="space-gallery">
+            <figure class="space-photo space-photo-main">
+                <img src="{{ url_for('static', filename='img/spa-camilla.jpg') }}"
+                     alt="Camilla de masaje preparada con toallas y velas"
+                     width="576" height="1024" loading="lazy">
+            </figure>
+            <div class="space-gallery-side">
+                <figure class="space-photo">
+                    <img src="{{ url_for('static', filename='img/spa-masajes.jpg') }}"
+                         alt="Preparación de un masaje relajante con aceite"
+                         width="799" height="1200" loading="lazy">
+                </figure>
+                <figure class="space-photo">
+                    <img src="{{ url_for('static', filename='img/masajes-piedras.jpg') }}"
+                         alt="Masaje corporal con piedras calientes"
+                         width="736" height="1104" loading="lazy">
+                </figure>
+                <figure class="space-photo">
+                    <img src="{{ url_for('static', filename='img/facial-hombre.jpg') }}"
+                         alt="Aplicación de una mascarilla facial"
+                         width="599" height="899" loading="lazy">
+                </figure>
+                <figure class="space-photo">
+                    <img src="{{ url_for('static', filename='img/sonido-cara.jpg') }}"
+                         alt="Tratamiento facial realizado con aparatología"
+                         width="736" height="919" loading="lazy">
+                </figure>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="reviews-section" aria-labelledby="resenas-titulo">
+    <div class="container">
+        <header class="reviews-heading">
+            <h2 id="resenas-titulo">Reseñas</h2>
+            <div class="reviews-rating" aria-label="Valoración de 4,9 sobre 5 basada en 33 reseñas">
+                <strong>4,9</strong>
+                <span class="review-stars" aria-hidden="true">★★★★★</span>
+                <span>33 reseñas en Google</span>
+            </div>
+        </header>
+
+        <div class="reviews-grid">
+            {% for resena in resenas %}
+                <article class="review-card">
+                    <div class="review-author">
+                        <span class="review-avatar" aria-hidden="true">{{ resena.iniciales }}</span>
+                        <div>
+                            <h3>{{ resena.nombre }}</h3>
+                            <span>{{ resena.fecha }}</span>
+                        </div>
+                        <span class="google-mark" aria-label="Reseña publicada en Google">G</span>
+                    </div>
+                    <div class="review-stars" aria-label="{{ resena.valoracion }} de 5 estrellas">★★★★★</div>
+                    <blockquote>“{{ resena.texto }}”</blockquote>
+                    <a href="{{ google_reviews_url }}" target="_blank" rel="noopener">Ver en Google <span aria-hidden="true">↗</span></a>
+                </article>
+            {% endfor %}
+        </div>
+
+        <div class="reviews-source">
+            <a class="btn btn-secondary" href="{{ google_reviews_url }}" target="_blank" rel="noopener">Ver todas las reseñas</a>
+        </div>
+    </div>
+</section>
+
+<section class="home-contact" aria-labelledby="contacto-titulo">
+    <div class="container contact-layout">
+        <div class="contact-column">
+            <span class="kicker">Contacto</span>
+            <h2 id="contacto-titulo">Ven a conocernos</h2>
+
+            <address class="contact-list">
+                <div class="contact-item">
+                    <span class="contact-icon" aria-hidden="true">📍</span>
+                    <div>
+                        <span class="contact-label">Dirección</span>
+                        <a href="https://www.google.com/maps/search/?api=1&amp;query=Estaci%C3%B3n+de+Gav%C3%A0%2C+Calle+Salamanca+1%2C+08850+Gav%C3%A0" target="_blank" rel="noopener">
+                            Calle Salamanca 1, 08850 Gavà
+                        </a>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon" aria-hidden="true">📱</span>
+                    <div>
+                        <span class="contact-label">Teléfono</span>
+                        <span class="contact-value">600 00 00 00</span>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon" aria-hidden="true">📷</span>
+                    <div>
+                        <span class="contact-label">Instagram</span>
+                        <a href="https://www.instagram.com/zen.bienestar/" target="_blank" rel="noopener">@zen.bienestar</a>
+                    </div>
+                </div>
+            </address>
+
+            <div class="contact-map">
+                <iframe
+                    title="Estación de Renfe de Gavà"
+                    src="https://www.google.com/maps?q=Estaci%C3%B3n%20de%20Gav%C3%A0%2C%20Calle%20Salamanca%201%2C%2008850%20Gav%C3%A0&amp;output=embed"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        </div>
+
+        <div class="hours-column">
+            <h3>Horarios</h3>
+            <dl class="hours-list">
+                <div><dt>Lunes</dt><dd>10:00–12:00 · 15:30–20:00</dd></div>
+                <div><dt>Martes</dt><dd>10:00–12:00 · 15:30–20:00</dd></div>
+                <div><dt>Miércoles</dt><dd>10:00–12:00 · 15:30–20:00</dd></div>
+                <div><dt>Jueves</dt><dd>10:00–12:00 · 15:30–20:00</dd></div>
+                <div><dt>Viernes</dt><dd>10:00–12:00 · 15:30–20:00</dd></div>
+                <div><dt>Sábado</dt><dd>10:00–13:00</dd></div>
+                <div><dt>Domingo</dt><dd>Cerrado</dd></div>
+            </dl>
+
+            <aside class="gift-card">
+                <h3>¿Quieres regalar bienestar?</h3>
+                <p>Pregúntanos por nuestras tarjetas regalo. Un detalle especial para alguien especial.</p>
+                <a href="{{ url_for('reservas') }}">
+                    Consultar disponibilidad <span aria-hidden="true">→</span>
+                </a>
+            </aside>
+        </div>
+    </div>
+</section>
+{% endblock %}

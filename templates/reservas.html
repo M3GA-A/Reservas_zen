@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}Reservar · Zen Bienestar{% endblock %}
+{% block content %}
+<section class="container section">
+    <div class="booking-head">
+        <div>
+            <span class="kicker">Nueva cita</span>
+            <h2>Crear una reserva</h2>
+            <p>Elige el tratamiento, encuentra tu horario y personaliza la experiencia.</p>
+        </div>
+    </div>
+
+    <form class="booking-flow" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <section class="booking-step" aria-labelledby="paso-servicio">
+            <div class="booking-step-head">
+                <span class="step-number">01</span>
+                <div>
+                    <h3 id="paso-servicio">Elige tu servicio</h3>
+                    <p>Selecciona el tratamiento que quieres reservar.</p>
+                </div>
+            </div>
+
+            <div class="service-choice-list">
+                {% for servicio in servicios %}
+                    <label class="service-choice">
+                        <input class="choice-input" type="radio" name="servicio" value="{{ servicio.nombre }}" required>
+                        <span class="service-choice-body">
+                            <span class="service-choice-icon" aria-hidden="true">♨</span>
+                            <span class="service-choice-copy">
+                                <strong>{{ servicio.nombre }}</strong>
+                                <small>{{ servicio.duracion }} min</small>
+                            </span>
+                            <span class="service-choice-price">{{ servicio.precio }} €</span>
+                        </span>
+                    </label>
+                {% endfor %}
+            </div>
+        </section>
+
+        <div class="booking-lower booking-step">
+            <section id="calendario-reservas" class="calendar-panel" aria-labelledby="paso-disponibilidad">
+                <div class="booking-step-head">
+                    <span class="step-number">02</span>
+                    <div>
+                        <h3 id="paso-disponibilidad">Elige fecha y hora</h3>
+                        <p>Recorre las semanas del año y elige un horario disponible.</p>
+                    </div>
+                </div>
+
+                <div class="opening-hours" aria-label="Horario del centro">
+                    <strong>Horario del centro</strong>
+                    <span>Lunes a viernes: 10:00–12:00 · 15:30–20:00</span>
+                    <span>Sábado: 10:00–13:00</span>
+                    <span>Domingo: cerrado</span>
+                </div>
+
+                <div class="week-calendar">
+                    <div class="week-calendar-toolbar">
+                        <div class="week-navigation">
+                            <a href="{{ url_for('reservas', inicio=fecha_anterior, vista=vista, _anchor='calendario-reservas') }}" aria-label="Semana anterior">‹</a>
+                            <h4>Semana {{ numero_semana }}: {{ semana[0].numero }} {{ semana[0].mes }} — {{ semana[6].numero }} {{ semana[6].mes }}</h4>
+                            <a href="{{ url_for('reservas', inicio=fecha_siguiente, vista=vista, _anchor='calendario-reservas') }}" aria-label="Semana siguiente">›</a>
+                        </div>
+                        <nav class="calendar-view-switch" aria-label="Vista del calendario">
+                            <a class="{% if vista == 'lista' %}active{% endif %}" href="{{ url_for('reservas', inicio=fecha_inicio.isoformat(), vista='lista', _anchor='calendario-reservas') }}">Lista</a>
+                            <a class="{% if vista == 'cuadricula' %}active{% endif %}" href="{{ url_for('reservas', inicio=fecha_inicio.isoformat(), vista='cuadricula', _anchor='calendario-reservas') }}">Cuadrícula</a>
+                            <a class="{% if vista == 'dia' %}active{% endif %}" href="{{ url_for('reservas', inicio=fecha_inicio.isoformat(), vista='dia', dia=dia_seleccionado.fecha, _anchor='calendario-reservas') }}">Día</a>
+                        </nav>
+                    </div>
+
+                    {% if vista == 'cuadricula' %}
+                        <div class="week-grid calendar-scroll-area">
+                            {% for dia in semana %}
+                                <article class="week-day-column{% if dia.cerrado or dia.pasado %} unavailable-day{% endif %}">
+                                    <header><span>{{ dia.dia_corto }}</span><strong>{{ dia.numero }}</strong><small>{{ dia.mes }}</small></header>
+                                    {% if dia.cerrado %}
+                                        <p class="day-closed">Cerrado</p>
+                                    {% elif dia.pasado %}
+                                        <p class="day-closed">Fecha pasada</p>
+                                    {% else %}
+                                        <div class="compact-time-list">
+                                            {% for horario in dia.horarios %}
+                                                <label class="time-choice{% if not horario.disponible %} unavailable{% endif %}">
+                                                    <input class="choice-input" type="radio" name="turno" value="{{ dia.fecha }}|{{ horario.hora }}" {% if not horario.disponible %}disabled{% endif %} required>
+                                                    <span>{{ horario.hora }}</span>
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </article>
+                            {% endfor %}
+                        </div>
+                    {% elif vista == 'lista' %}
+                        <div class="calendar-list calendar-scroll-area">
+                            {% for dia in semana %}
+                                <article class="calendar-list-day">
+                                    <header><strong>{{ dia.dia }} {{ dia.numero }}</strong><span>{{ dia.mes }}</span></header>
+                                    {% if dia.cerrado or dia.pasado %}
+                                        <p>{{ 'Cerrado' if dia.cerrado else 'Fecha pasada' }}</p>
+                                    {% else %}
+                                        <div class="list-time-slots">
+                                            {% for horario in dia.horarios %}
+                                                <label class="time-choice{% if not horario.disponible %} unavailable{% endif %}">
+                                                    <input class="choice-input" type="radio" name="turno" value="{{ dia.fecha }}|{{ horario.hora }}" {% if not horario.disponible %}disabled{% endif %} required>
+                                                    <span>{{ horario.hora }}</span>
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </article>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <nav class="day-picker" aria-label="Elegir día de la semana">
+                            {% for dia in semana %}
+                                <a class="{% if dia.fecha == dia_seleccionado.fecha %}active{% endif %}" href="{{ url_for('reservas', inicio=fecha_inicio.isoformat(), vista='dia', dia=dia.fecha, _anchor='calendario-reservas') }}">
+                                    <span>{{ dia.dia_corto }}</span><strong>{{ dia.numero }}</strong>
+                                </a>
+                            {% endfor %}
+                        </nav>
+                        <div class="day-view-schedule">
+                            <h4>{{ dia_seleccionado.dia }} {{ dia_seleccionado.numero }} de {{ dia_seleccionado.mes }}</h4>
+                            {% if dia_seleccionado.cerrado or dia_seleccionado.pasado %}
+                                <p>{{ 'El centro está cerrado.' if dia_seleccionado.cerrado else 'Esta fecha ya ha pasado.' }}</p>
+                            {% else %}
+                                <div class="list-time-slots">
+                                    {% for horario in dia_seleccionado.horarios %}
+                                        <label class="time-choice{% if not horario.disponible %} unavailable{% endif %}">
+                                            <input class="choice-input" type="radio" name="turno" value="{{ dia_seleccionado.fecha }}|{{ horario.hora }}" {% if not horario.disponible %}disabled{% endif %} required>
+                                            <span>{{ horario.hora }}</span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <p class="availability-note"><span></span> Disponible <span></span> Ocupado</p>
+            </section>
+
+            <section class="personalize-panel" aria-labelledby="paso-personalizar">
+                <div class="booking-step-head">
+                    <span class="step-number">03</span>
+                    <div>
+                        <h3 id="paso-personalizar">Personaliza tu experiencia</h3>
+                        <p>Cuéntanos para quién es la reserva.</p>
+                    </div>
+                </div>
+
+                <div class="personalize-fields">
+                    <div class="form-group">
+                        <label for="nombre">Nombre *</label>
+                        <input id="nombre" name="nombre" required placeholder="Ej: Marta Pérez" autocomplete="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="telefono">Teléfono *</label>
+                        <input id="telefono" name="telefono" required placeholder="Ej: 600 000 000" autocomplete="tel">
+                    </div>
+                    <div class="form-group">
+                        <label for="comentario">Preferencias</label>
+                        <textarea id="comentario" name="comentario" placeholder="Alergias, intensidad del masaje o cualquier detalle que debamos saber..."></textarea>
+                    </div>
+                </div>
+
+                <div class="booking-summary-note">
+                    Tu cita se guardará como pendiente hasta que el centro la confirme.
+                </div>
+
+                <div class="booking-actions">
+                    <button class="btn btn-primary" type="submit">Finalizar reserva</button>
+                    {% if session.get('admin_autenticado') %}
+                        <a class="btn btn-secondary" href="{{ url_for('panel') }}">Ver panel</a>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+    </form>
+</section>
+{% include "_contacto_final.html" %}
+{% endblock %}

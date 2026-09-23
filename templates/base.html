@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light only">
+    <meta name="darkreader-lock">
+    <title>{% block title %}Zen Bienestar{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&amp;family=Playfair+Display:wght@500;600;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css', v='premium-fonts-20260701') }}">
+</head>
+<body class="page-{{ request.endpoint or 'default' }}">
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a class="logo" href="{{ url_for('inicio') }}">
+                <span class="logo-icon">
+                    <img src="{{ url_for('static', filename='img/spa.png') }}" alt="Logo Reservas Zen">
+                </span>
+                <span>Zen Bienestar</span>
+            </a>
+            <div class="nav-links">
+                <a class="{% if request.endpoint == 'inicio' %}active{% endif %}" href="{{ url_for('inicio') }}">Inicio</a>
+                <a class="{% if request.endpoint == 'servicios' %}active{% endif %}" href="{{ url_for('servicios') }}">Servicios</a>
+                <a class="{% if request.endpoint == 'reservas' %}active{% endif %}" href="{{ url_for('reservas') }}">Reservar</a>
+                {% if session.get('admin_autenticado') %}
+                    <a class="{% if request.endpoint == 'panel' %}active{% endif %}" href="{{ url_for('panel') }}">Panel</a>
+                    <form class="nav-logout" method="post" action="{{ url_for('admin_logout') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <button type="submit">Salir</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% if not mongo_ok %}
+                <div class="mongo-alert">MongoDB no está conectado. Puedes navegar el sitio, pero para guardar reservas activa MongoDB.</div>
+            {% endif %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            © 2026 Zen Centro de bienestar · Masajes y Estética
+            {% if request.endpoint == 'inicio' and not session.get('admin_autenticado') %}
+                <a class="admin-access" href="{{ url_for('admin_login') }}">Acceso administración</a>
+            {% endif %}
+        </div>
+    </footer>
+</body>
+</html>

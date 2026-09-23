@@ -1,0 +1,8 @@
+# Aplicación web
+Flask==3.0.3
+
+# Cliente de MongoDB
+pymongo==4.8.0
+
+# Variables de entorno
+python-dotenv==1.0.1

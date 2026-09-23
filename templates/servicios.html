@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Servicios · Zen Bienestar{% endblock %}
+{% block content %}
+<section class="container section">
+    <div class="section-head">
+        <div>
+            <span class="kicker">Catálogo</span>
+            <h2>Servicios disponibles</h2>
+            <p>Consulta la duración, el precio y el tipo de tratamiento antes de reservar.</p>
+        </div>
+        <a class="btn btn-primary" href="{{ url_for('reservas') }}">Reservar ahora</a>
+    </div>
+
+    <div class="service-filters" aria-label="Filtrar servicios por tipo">
+        <a class="filter-btn {% if categoria_actual == 'todos' %}active{% endif %}"
+           href="{{ url_for('servicios') }}"
+           {% if categoria_actual == 'todos' %}aria-current="page"{% endif %}>Todos</a>
+        <a class="filter-btn {% if categoria_actual == 'corporales' %}active{% endif %}"
+           href="{{ url_for('servicios', categoria='corporales') }}"
+           {% if categoria_actual == 'corporales' %}aria-current="page"{% endif %}>Corporales</a>
+        <a class="filter-btn {% if categoria_actual == 'faciales' %}active{% endif %}"
+           href="{{ url_for('servicios', categoria='faciales') }}"
+           {% if categoria_actual == 'faciales' %}aria-current="page"{% endif %}>Faciales</a>
+        <span class="filter-result">{{ servicios|length }} servicios</span>
+    </div>
+
+    <div class="grid services-grid">
+        {% for servicio in servicios %}
+            <article class="card service-card">
+                <span class="badge">{{ servicio.categoria }}</span>
+                <h3>{{ servicio.nombre }}</h3>
+                <p>{{ servicio.descripcion }}</p>
+                <div class="service-meta">
+                    <span>{{ servicio.duracion }} min</span>
+                    <span>{{ servicio.precio }} €</span>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+{% include "_contacto_final.html" %}
+{% endblock %}

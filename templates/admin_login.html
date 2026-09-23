@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Acceso administración · Zen Bienestar{% endblock %}
+{% block content %}
+<section class="container section admin-login-shell">
+    <div class="admin-login-heading">
+        <span class="kicker">Área privada</span>
+        <h2>Acceso de administración</h2>
+        <p>Introduce la clave de acceso para gestionar las reservas.</p>
+    </div>
+
+    <form class="admin-login-card" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="form-group">
+            <label for="access_key">Clave de acceso</label>
+            <input id="access_key" type="password" name="access_key" required autocomplete="current-password" autofocus>
+        </div>
+        <button class="btn btn-primary" type="submit">Entrar al panel</button>
+    </form>
+</section>
+{% endblock %}
